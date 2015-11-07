@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"fmt"
 
 	"net/http/cookiejar"
 
@@ -117,6 +118,8 @@ func buildRequest(httpMethod, url string, ro *RequestOptions, httpClient *http.C
 	if httpClient == nil {
 		httpClient = BuildHTTPClient(*ro)
 	}
+
+	defaultRedirectLimit := 30
 
 	httpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		if len(via) > defaultRedirectLimit {
