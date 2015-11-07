@@ -118,6 +118,21 @@ func buildRequest(httpMethod, url string, ro *RequestOptions, httpClient *http.C
 		httpClient = BuildHTTPClient(*ro)
 	}
 
+	httpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if len(via) > defaultRedirectLimit {
+			return fmt.Errorf("%d consecutive requests(redirects)", len(via))
+		}
+		if len(via) == 0 {
+			// No redirects
+			return nil
+		}
+		// mutate the subsequent redirect requests with the first Header
+		for key, val := range via[0].Header {
+			req.Header[key] = val
+		}
+		return nil
+	}
+
 	// Build our URL
 
 	var (
